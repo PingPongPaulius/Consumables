@@ -1,0 +1,133 @@
+Create the item by following steps:
+
+   boolean used;
+       boolean rotate;
+       int animationLength;
+       int dropHeight;
+       Image[] srcs;
+       double angle;
+
+       int animationHeight;
+       int animationWidth;
+       int animationX;
+       int animationY;
+
+       GraphicRenderer renderer;
+       Player player;
+
+create default values method to add all default values needed for the item
+
+        this.x = x;
+        this.y = y;
+        this.used = false;
+        this.rotate = false;
+        this.height = 32;
+        this.width = 32;
+        this.ID = ""; //<-- enter value here
+        this.isConsumed = false;
+        this.isPicked = false;
+        this.isOnGround = false;
+        this.icon = ImageLoader.getImage(""); //<--- add any path here
+        animationLength = ; //change how long your aniation should be
+        dropHeight = ; //<--- how high item shoots before falling, this happens during the drop
+        srcs = new Image[]{};
+        angle = 0;
+
+create 2 constructors one with Graphic Renderer and player one without them, both should have x and y floats
+
+get default price method: just return the default price
+
+consume method basically sets consumed to be true, however this method can set players stats as well
+
+drop animation is pretty much default unless I want a specific drop:
+
+ @Override
+    public void dropAnimation(GraphicRenderer renderer) {
+        this.renderer = renderer;
+        for(Token t: renderer.list()){
+            if(t instanceof Platform){
+                Platform platform = (Platform) t;
+                setOnGround(platform);              // if colliding with platform aka standing on ground
+                if(isOnGround) return;               // if is standing on some ground then end the loop, this may break horizontal collider so just make another for loop then
+            }
+        }
+        if(dropHeight <= 0)
+            this.y += 0.5f;
+        else{
+            this.y -= 0.5f;
+            this.dropHeight -= 0.5f;
+        }
+        rotate = true;
+    }
+
+
+these methods are pretty much default too
+
+@Override
+    public boolean isUsed() {
+        return used;
+    }
+
+    @Override
+    public String stringify() {
+        return this.ID;
+    }
+
+    @Override
+    public void add(Player p, GraphicRenderer r) {
+        this.p = p;
+        renderer = r;
+    }
+animation init is initialising animation parameters
+
+    public void animationInit(){
+        animationHeight = ;
+        animationWidth = ;
+        animationX = ;
+        animationY = ;
+    }
+
+finally we have render method that makes the animation
+
+@Override
+    public void render(Graphics g) {
+
+        //starting the animation
+
+        rotate = false;
+        animationInit();
+
+        // animation that happens when user presses the use button
+
+        if(isConsumed && animationLength >=0){
+
+            Image src = Physics.getImage();   //<-- requires a method that has every image and then sets the animation image to display
+
+            animationInit();
+            g.drawImage(src,animationX, animationY, animationWidth, animationHeight, null);
+            animationLength--;
+            if(animationLength <= 0){       // after everything ends set these values to default otherwise the second item will not fire
+                player.endUse();
+                this.isConsumed = false;
+                this.animationLength = ;
+            }
+        }
+        //if item isn't picked usually stays the same
+        else if(!isPicked){
+
+            dropAnimation(renderer);
+            Graphics2D g2d = (Graphics2D) g;
+            AffineTransform at = AffineTransform.getTranslateInstance(x, y);
+            if(rotate) {
+                at.rotate(Math.toDegrees(angle++), width/2, height/2);
+            }
+            g2d.drawImage(this.icon, at, null);
+        }
+
+    }
+
+
+Next Go to items class and add ID to stringify method
+
+
+Finally go to the shop and add the item to al items methos

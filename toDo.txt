@@ -1,0 +1,2 @@
+
+ckeck if the inventory is not full in shop! <- not tested
